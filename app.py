@@ -12,6 +12,10 @@ def index():
     image_url = url_for('static', filename='images/chiki.gif')
     return render_template('land.html', image_url=image_url)
 
+@app.route('/new')
+def new():
+    return render_template('new.html')
+
 
 @app.route('/form')
 def form():
@@ -95,4 +99,4 @@ def download_file(file_name):
 
 
 if __name__ == '__main__':
-    app.run(debug=False,host='0.0.0.0')
+    app.run(debug=True)
