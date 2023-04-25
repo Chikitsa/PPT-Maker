@@ -3,8 +3,10 @@ from pptx import Presentation
 from flask import Flask, render_template, url_for
 
 from pptx.util import Inches
-
+from flask import Flask
 app = Flask(__name__)
+app.config['DEBUG'] = True
+
 
 
 @app.route('/')
@@ -12,14 +14,19 @@ def index():
     image_url = url_for('static', filename='images/chiki.gif')
     return render_template('land.html', image_url=image_url)
 
-@app.route('/new')
-def new():
-    return render_template('new.html')
+@app.route('/title')
+def title():
+     return render_template('title.html')
 
 
 @app.route('/form')
 def form():
     return render_template('input_form.html')
+
+def generate_title():
+    about_text = request.form['project_description']
+
+    title_text = request.form['project_title']
 
 
 @app.route('/submit', methods=['POST'])
@@ -31,18 +38,29 @@ def generate_ppt():
     abstract_text = request.form['project-abstract']
     Solution_text = request.form['project-solution']
     Techstack_text = request.form['project-techstack']
+    Conclusion_text = request.form['project-conclusion']
+    Intro_text = request.form['project-intro']
+
 
     # image_path = request.form['project_image']
     # Create a new PowerPoint presentation
     pr = Presentation()
 
     # Slide 1 - Title slide
-    slide1_layout = pr.slide_layouts[1]
+    slide1_layout = pr.slide_layouts[0]
     slide1 = pr.slides.add_slide(slide1_layout)
     title_shape = slide1.shapes.title
-    title_shape.text = "Introduction"
-    bullet_shape = slide1.placeholders[1]
+    title_shape.text = title_text
+    bullet_shape = slide1.placeholders[0]
     bullet_shape.text = members_text
+
+    slide7_layout = pr.slide_layouts[1]
+    slide7 = pr.slides.add_slide(slide7_layout)
+    title_shape = slide7.shapes.title
+    title_shape.text = "Introduction"
+    bullet_shape = slide7.placeholders[1]
+    bullet_shape.text = Intro_text
+    
 
     # Slide 2 - About slide
     slide2_layout = pr.slide_layouts[1]
@@ -76,6 +94,13 @@ def generate_ppt():
     bullet_shape = slide5.placeholders[1]
     bullet_shape.text = Techstack_text
 
+    slide6_layout = pr.slide_layouts[1]
+    slide6 = pr.slides.add_slide(slide6_layout)
+    title_shape = slide6.shapes.title
+    title_shape.text = 'Conclusion'
+    bullet_shape = slide6.placeholders[1]
+    bullet_shape.text = Conclusion_text
+
     # # Slide 3 - Image slide
     # slide3_layout = pr.slide_layouts[5]
     # slide3 = pr.slides.add_slide(slide3_layout)
@@ -88,6 +113,7 @@ def generate_ppt():
     pr.save(file_name + '.pptx')
 
     return render_template('success.html', file_name=file_name)
+
 
 @app.route('/download/<string:file_name>', methods=['GET'])
 def download_file(file_name):
